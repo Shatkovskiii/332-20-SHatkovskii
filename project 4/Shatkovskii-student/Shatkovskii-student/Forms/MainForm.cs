@@ -23,7 +23,6 @@ namespace Shatkovskii_student.Forms
 
         private void InitializeControls()
         {
-            // Настройка DataGridView
             dataGridView.AutoGenerateColumns = false;
             dataGridView.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -69,11 +68,9 @@ namespace Shatkovskii_student.Forms
                 DataPropertyName = "Email"
             });
 
-            // Настройка ComboBox для фильтрации по курсу
             cbCourse.Items.AddRange(Enumerable.Range(1, 6).Cast<object>().ToArray());
             cbCourse.SelectedIndexChanged += FilterStudents;
 
-            // Настройка TextBox для поиска по фамилии
             txtSearch.TextChanged += FilterStudents;
         }
 
@@ -189,16 +186,39 @@ namespace Shatkovskii_student.Forms
             using (var dialog = new SaveFileDialog())
             {
                 dialog.Filter = "JSON files (*.json)|*.json";
+                dialog.Title = "Сохранить данные студентов";
+                dialog.DefaultExt = "json";
+                
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
+                        var directory = System.IO.Path.GetDirectoryName(dialog.FileName);
+                        if (!System.IO.Directory.Exists(directory))
+                        {
+                            System.IO.Directory.CreateDirectory(directory);
+                        }
+
+                        using (var fs = new System.IO.FileStream(dialog.FileName, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+                        {
+                            fs.Close();
+                            System.IO.File.Delete(dialog.FileName);
+                        }
+
                         _studentManager.SaveToJson(dialog.FileName);
-                        MessageBox.Show("Данные успешно сохранены", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Сохранено (ура)", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        MessageBox.Show("Нет прав на запись (о нет(", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    catch (System.IO.IOException ex)
+                    {
+                        MessageBox.Show($"Файл занят (о нет(", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Ошибка (о нет(", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -218,7 +238,7 @@ namespace Shatkovskii_student.Forms
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при загрузке: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Ошибка загрузки (о нет(", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -238,7 +258,7 @@ namespace Shatkovskii_student.Forms
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при импорте: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Ошибка импорта (о нет(", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -254,11 +274,11 @@ namespace Shatkovskii_student.Forms
                     try
                     {
                         _studentManager.ExportToCsv(dialog.FileName);
-                        MessageBox.Show("Данные успешно экспортированы", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Экспортировано (ура)", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при экспорте: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"Ошибка экспорта (о нет(", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }

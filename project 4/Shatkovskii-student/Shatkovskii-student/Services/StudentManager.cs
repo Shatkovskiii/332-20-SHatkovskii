@@ -99,8 +99,8 @@ namespace Shatkovskii_student.Services
 
         public void ImportFromCsv(string filePath)
         {
-            var lines = File.ReadAllLines(filePath);
-            foreach (var line in lines.Skip(1)) // Пропускаем заголовок
+            var lines = File.ReadAllLines(filePath, System.Text.Encoding.UTF8);
+            foreach (var line in lines.Skip(1))
             {
                 var values = line.Split(',');
                 if (values.Length >= 7)
@@ -133,7 +133,7 @@ namespace Shatkovskii_student.Services
                          $"{student.Course},{student.Group},{student.BirthDate:dd.MM.yyyy},{student.Email}");
             }
 
-            File.WriteAllLines(filePath, lines);
+            File.WriteAllLines(filePath, lines, System.Text.Encoding.UTF8);
         }
     }
 } 

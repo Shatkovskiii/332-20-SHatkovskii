@@ -29,12 +29,10 @@ namespace Shatkovskii_student.Forms
 
         private void SetupControls()
         {
-            // Настройка DateTimePicker
             dtpBirthDate.MinDate = new DateTime(1992, 1, 1);
             dtpBirthDate.MaxDate = DateTime.Now;
             dtpBirthDate.Format = DateTimePickerFormat.Short;
 
-            // Настройка ComboBox для курса
             cbCourse.Items.AddRange(Enumerable.Range(1, 6).Cast<object>().ToArray());
         }
 
