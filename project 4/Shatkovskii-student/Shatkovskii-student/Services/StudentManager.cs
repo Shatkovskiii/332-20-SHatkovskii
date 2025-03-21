@@ -65,9 +65,38 @@ namespace Shatkovskii_student.Services
         public void SaveToJson(string filePath)
         {
             var json = JsonConvert.SerializeObject(_students, Formatting.Indented);
-            File.WriteAllText(filePath, json);
-            _currentFilePath = filePath;
-            _hasUnsavedChanges = false;
+            try
+            {
+                var fullPath = Path.GetFullPath(filePath);
+                var directory = Path.GetDirectoryName(fullPath);
+                
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+                using (var writer = new StreamWriter(fs, System.Text.Encoding.UTF8))
+                {
+                    writer.Write(json);
+                }
+                
+                _currentFilePath = fullPath;
+                _hasUnsavedChanges = false;
+            }
+            catch (Exception)
+            {
+                var tempPath = Path.GetTempFileName();
+                File.WriteAllText(tempPath, json, System.Text.Encoding.UTF8);
+                var fullPath = Path.GetFullPath(filePath);
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+                File.Move(tempPath, fullPath);
+                _currentFilePath = fullPath;
+                _hasUnsavedChanges = false;
+            }
         }
 
         public void LoadFromJson(string filePath)
@@ -133,7 +162,36 @@ namespace Shatkovskii_student.Services
                          $"{student.Course},{student.Group},{student.BirthDate:dd.MM.yyyy},{student.Email}");
             }
 
-            File.WriteAllLines(filePath, lines, System.Text.Encoding.UTF8);
+            try
+            {
+                var fullPath = Path.GetFullPath(filePath);
+                var directory = Path.GetDirectoryName(fullPath);
+                
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+                using (var writer = new StreamWriter(fs, System.Text.Encoding.UTF8))
+                {
+                    foreach (var line in lines)
+                    {
+                        writer.WriteLine(line);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                var tempPath = Path.GetTempFileName();
+                File.WriteAllLines(tempPath, lines, System.Text.Encoding.UTF8);
+                var fullPath = Path.GetFullPath(filePath);
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+                File.Move(tempPath, fullPath);
+            }
         }
     }
 } 

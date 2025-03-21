@@ -199,12 +199,6 @@ namespace Shatkovskii_student.Forms
                             System.IO.Directory.CreateDirectory(directory);
                         }
 
-                        using (var fs = new System.IO.FileStream(dialog.FileName, System.IO.FileMode.Create, System.IO.FileAccess.Write))
-                        {
-                            fs.Close();
-                            System.IO.File.Delete(dialog.FileName);
-                        }
-
                         _studentManager.SaveToJson(dialog.FileName);
                         MessageBox.Show("Сохранено (ура)", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
